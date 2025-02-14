@@ -425,13 +425,19 @@ function calculateStats() {
                 // Speciální výpočet pro noční směny o víkendu
                 if ((shift === 'N' || shift === 'NSK') && isWeekend(day)) {
                     const date = new Date(currentYear, currentMonth - 1, day);
-                    if (date.getDay() === 5) { // Pátek
-                        weekendHours += getFridayHours(shift);
-                    } else if (date.getDay() === 0) { // Neděle
+                    if (date.getDay() === 0) { // Neděle
                         weekendHours += getSundayHours(shift);
                     } else {
                         weekendHours += hours;
                     }
+                } else if (date.getDay() === 6) { // Sobota
+                    // Zkontrolovat, jestli byla předchozí den (pátek) noční směna
+                    const fridayDate = new Date(currentYear, currentMonth - 1, day - 1);
+                    const fridayShift = shifts[`${name}-${fridayDate.getDate()}`];
+                    if (fridayShift === 'N' || fridayShift === 'NSK') {
+                        weekendHours += getFridayHours(fridayShift);
+                    }
+                    weekendHours += hours;
                 } else if (isWeekend(day)) {
                     weekendHours += hours;
                 }
