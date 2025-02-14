@@ -147,14 +147,14 @@ function initializeMonthYearSelects() {
     // Event listeners
     monthSelect.addEventListener('change', (e) => {
         currentMonth = parseInt(e.target.value);
+        loadSavedData();
         updateTable();
-        saveShifts();
     });
 
     yearSelect.addEventListener('change', (e) => {
         currentYear = parseInt(e.target.value);
+        loadSavedData();
         updateTable();
-        saveShifts();
     });
 }
 
