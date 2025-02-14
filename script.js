@@ -624,7 +624,7 @@ function exportToWord() {
     `;
 
     const monthName = new Date(currentYear, currentMonth - 1).toLocaleString('cs', { month: 'long' });
-    const content = `
+    let content = `
         <h1>Rozpis služeb - ${monthName} ${currentYear}</h1>
         <table>
             <tr>
