@@ -417,14 +417,15 @@ function calculateStats() {
         });
 
         for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(currentYear, currentMonth - 1, day);
             const shift = shifts[`${name}-${day}`];
+            
             if (shift && shiftTypes[shift]) {
                 shiftCounts[shift]++;
                 let hours = shiftTypes[shift].hours;
 
                 // Speciální výpočet pro noční směny o víkendu
                 if ((shift === 'N' || shift === 'NSK') && isWeekend(day)) {
-                    const date = new Date(currentYear, currentMonth - 1, day);
                     if (date.getDay() === 0) { // Neděle
                         weekendHours += getSundayHours(shift);
                     } else {
