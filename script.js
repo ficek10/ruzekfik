@@ -597,7 +597,7 @@ function exportToWord() {
                 .employee-name {
                     text-align: left;
                     padding-left: 8px;
-                    width: 140px;
+                    width: 150px;
                     background-color: #f8f9fa;
                     font-size: 11px;
                 }
@@ -608,9 +608,6 @@ function exportToWord() {
                 .employee-lastname {
                     display: block;
                     font-weight: bold;
-                }
-                .shift-cell {
-                    width: 28px;
                 }
                 .shift-N {
                     background-color: #e0e0e0 !important;
