@@ -597,7 +597,7 @@ function exportToWord() {
                 .employee-name {
                     text-align: left;
                     padding-left: 8px;
-                    width: 150px;
+                    width: 140px;
                     background-color: #f8f9fa;
                     font-size: 11px;
                 }
