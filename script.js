@@ -63,17 +63,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Ukládání a načítání dat
 function saveShifts() {
-    localStorage.setItem('shifts', JSON.stringify(shifts));
+    // Vytvoříme klíč pro konkrétní měsíc a rok
+    const monthKey = `shifts_${currentYear}_${currentMonth}`;
+    
+    // Uložíme směny pro konkrétní měsíc
+    const allShifts = JSON.parse(localStorage.getItem('allShifts') || '{}');
+    allShifts[monthKey] = shifts;
+    
+    localStorage.setItem('allShifts', JSON.stringify(allShifts));
     localStorage.setItem('currentMonth', currentMonth);
     localStorage.setItem('currentYear', currentYear);
 }
 
 function loadSavedData() {
-    // Načtení směn
-    const savedShifts = localStorage.getItem('shifts');
-    if (savedShifts) {
-        shifts = JSON.parse(savedShifts);
-    }
+    // Načtení všech uložených směn
+    const allShifts = JSON.parse(localStorage.getItem('allShifts') || '{}');
+    
+    // Klíč pro aktuální měsíc a rok
+    const monthKey = `shifts_${currentYear}_${currentMonth}`;
+    
+    // Načtení směn pro aktuální měsíc, pokud existují
+    shifts = allShifts[monthKey] || {};
 
     // Načtení aktuálního měsíce a roku
     const savedMonth = localStorage.getItem('currentMonth');
@@ -705,4 +715,20 @@ function saveAllRules() {
     localStorage.setItem('generalRules', JSON.stringify(generalRules));
 
     alert('Pravidla byla úspěšně uložena');
+}
+function clearCurrentMonthShifts() {
+    if (confirm(`Opravdu chcete vymazat všechny služby pro ${new Date(currentYear, currentMonth - 1).toLocaleString('cs', { month: 'long' })} ${currentYear}?`)) {
+        // Vymazání služeb z aktuálního měsíce
+        const allShifts = JSON.parse(localStorage.getItem('allShifts') || '{}');
+        const monthKey = `shifts_${currentYear}_${currentMonth}`;
+        delete allShifts[monthKey];
+        localStorage.setItem('allShifts', JSON.stringify(allShifts));
+        
+        // Resetování aktuálních služeb
+        shifts = {};
+        
+        // Aktualizace tabulky
+        updateTable();
+        alert('Služby byly vymazány.');
+    }
 }
