@@ -68,7 +68,11 @@ function saveShifts() {
     
     // Uložíme směny pro konkrétní měsíc
     const allShifts = JSON.parse(localStorage.getItem('allShifts') || '{}');
-    allShifts[monthKey] = shifts;
+    
+    // DŮLEŽITÉ: Ukládáme jen neprázdné služby
+    if (Object.keys(shifts).length > 0) {
+        allShifts[monthKey] = shifts;
+    }
     
     localStorage.setItem('allShifts', JSON.stringify(allShifts));
     localStorage.setItem('currentMonth', currentMonth);
@@ -82,8 +86,14 @@ function loadSavedData() {
     // Klíč pro aktuální měsíc a rok
     const monthKey = `shifts_${currentYear}_${currentMonth}`;
     
-    // Načtení směn pro aktuální měsíc, pokud existují
-    shifts = allShifts[monthKey] || {};
+    // DŮLEŽITÉ: Vždy nastavujeme prázdné směny, 
+    // pokud pro daný měsíc nejsou uloženy
+    shifts = {};
+
+    // Pokud existují směny pro tento měsíc, načteme je
+    if (allShifts[monthKey]) {
+        shifts = allShifts[monthKey];
+    }
 
     // Načtení aktuálního měsíce a roku
     const savedMonth = localStorage.getItem('currentMonth');
