@@ -68,17 +68,12 @@ function saveShifts() {
     
     // Uložíme směny pro konkrétní měsíc
     const allShifts = JSON.parse(localStorage.getItem('allShifts') || '{}');
-    
-    // DŮLEŽITÉ: Ukládáme jen neprázdné služby
-    if (Object.keys(shifts).length > 0) {
-        allShifts[monthKey] = shifts;
-    }
+    allShifts[monthKey] = shifts;
     
     localStorage.setItem('allShifts', JSON.stringify(allShifts));
     localStorage.setItem('currentMonth', currentMonth);
     localStorage.setItem('currentYear', currentYear);
 }
-
 function loadSavedData() {
     // Načtení všech uložených směn
     const allShifts = JSON.parse(localStorage.getItem('allShifts') || '{}');
@@ -86,14 +81,8 @@ function loadSavedData() {
     // Klíč pro aktuální měsíc a rok
     const monthKey = `shifts_${currentYear}_${currentMonth}`;
     
-    // DŮLEŽITÉ: Vždy nastavujeme prázdné směny, 
-    // pokud pro daný měsíc nejsou uloženy
-    shifts = {};
-
-    // Pokud existují směny pro tento měsíc, načteme je
-    if (allShifts[monthKey]) {
-        shifts = allShifts[monthKey];
-    }
+    // Načtení směn pro aktuální měsíc, pokud existují
+    shifts = allShifts[monthKey] || {};
 
     // Načtení aktuálního měsíce a roku
     const savedMonth = localStorage.getItem('currentMonth');
@@ -117,8 +106,6 @@ function loadSavedData() {
         });
     }
 }
-
-// Inicializace výběru měsíce a roku
 function initializeMonthYearSelects() {
     const monthSelect = document.getElementById('monthSelect');
     const yearSelect = document.getElementById('yearSelect');
@@ -146,14 +133,16 @@ function initializeMonthYearSelects() {
 
     // Event listeners
     monthSelect.addEventListener('change', (e) => {
+        // Uložíme aktuální stav před změnou měsíce
+        saveShifts();
         currentMonth = parseInt(e.target.value);
-        loadSavedData();
         updateTable();
     });
 
     yearSelect.addEventListener('change', (e) => {
+        // Uložíme aktuální stav před změnou roku
+        saveShifts();
         currentYear = parseInt(e.target.value);
-        loadSavedData();
         updateTable();
     });
 }
@@ -182,6 +171,11 @@ function createShiftTable() {
 function updateTable() {
     const table = document.getElementById('shiftTable');
     if (!table) return;
+
+    // Načteme uložené směny pro aktuální měsíc
+    const allShifts = JSON.parse(localStorage.getItem('allShifts') || '{}');
+    const monthKey = `shifts_${currentYear}_${currentMonth}`;
+    shifts = allShifts[monthKey] || {};
 
     const thead = table.querySelector('thead tr');
     const tbody = table.querySelector('tbody');
