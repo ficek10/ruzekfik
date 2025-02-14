@@ -561,39 +561,77 @@ function exportToWord() {
                     margin: 1cm;
                 }
                 body {
-                    font-family: Tahoma;
+                    font-family: Tahoma, Arial, sans-serif;
+                    margin: 0;
+                    padding: 10px;
+                    width: 100%;
+                    height: 100%;
                 }
                 h1 {
                     text-align: center;
-                    margin-bottom: 20px;
+                    font-size: 26px;
+                    margin-bottom: 15px;
+                    color: #333;
+                    font-weight: bold;
                 }
                 table {
                     border-collapse: collapse;
                     width: 100%;
+                    height: calc(100% - 50px);
                     table-layout: fixed;
                 }
                 th, td {
-                    border: 1px solid black;
-                    padding: 4px;
+                    border: 1px solid #333;
+                    padding: 4px 2px;
                     text-align: center;
+                    font-size: 12px;
+                    font-weight: bold;
                 }
                 th {
                     background-color: #f0f0f0;
                     font-weight: bold;
                 }
                 .weekend {
-                    background-color: #fffde7;
+                    background-color: #fff9c4;
+                }
+                .employee-name {
+                    text-align: left;
+                    padding-left: 8px;
+                    width: 140px;
+                    background-color: #f8f9fa;
+                    font-size: 11px;
+                }
+                .employee-firstname {
+                    display: block;
+                    font-weight: bold;
+                }
+                .employee-lastname {
+                    display: block;
+                    font-weight: bold;
+                }
+                .shift-cell {
+                    width: 28px;
+                }
+                .shift-N {
+                    background-color: #e0e0e0 !important;
+                }
+                .shift-D {
+                    background-color: #90EE90 !important;
+                }
+                .shift-NSK {
+                    background-color: #add8e6 !important;
                 }
             </style>
         </head>
         <body>
     `;
 
-    let content = `
-        <h1>${new Date(currentYear, currentMonth - 1).toLocaleString('cs', { month: 'long' })} ${currentYear}</h1>
+    const monthName = new Date(currentYear, currentMonth - 1).toLocaleString('cs', { month: 'long' });
+    const content = `
+        <h1>Rozpis služeb - ${monthName} ${currentYear}</h1>
         <table>
             <tr>
-                <th>Jméno</th>
+                <th class="employee-name">Jméno</th>
     `;
 
     const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
@@ -604,27 +642,38 @@ function exportToWord() {
     }
     content += '</tr>';
 
-    // Data zaměstnanců - použití exportColors pro vybrané služby
+    // Data zaměstnanců
     Object.keys(employees).forEach(employee => {
-        content += `<tr><td>${employee}</td>`;
+        const [lastName, firstName] = employee.split(' ');
+        content += `
+            <tr>
+                <td class="employee-name">
+                    <span class="employee-firstname">${firstName}</span>
+                    <span class="employee-lastname">${lastName}</span>
+                </td>`;
+        
         for (let day = 1; day <= daysInMonth; day++) {
             const shift = shifts[`${employee}-${day}`] || '';
-            const style = shift && exportColors[shift] ? 
-                `background-color: ${exportColors[shift]}` : '';
-            content += `<td style="${style}">${shift}</td>`;
+            const isWeekendDay = isWeekend(day);
+            let shiftClass = '';
+            
+            if (shift === 'N') shiftClass = 'shift-N';
+            else if (shift === 'D') shiftClass = 'shift-D';
+            else if (shift === 'NSK') shiftClass = 'shift-NSK';
+            
+            content += `<td class="${isWeekendDay ? 'weekend' : ''} ${shiftClass}">${shift}</td>`;
         }
         content += '</tr>';
     });
 
     content += '</table>';
-
     const footer = `</body></html>`;
 
     const blob = new Blob([header + content + footer], { type: 'application/msword' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `Rozpis_${currentYear}_${currentMonth}.doc`;
+    link.download = `Rozpis_sluzeb_${monthName}_${currentYear}.doc`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
